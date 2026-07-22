@@ -1,0 +1,65 @@
+# democast.config.yaml — how the robot behaves. Committed to your repo.
+# Everything app-specific lives here or in the actions plugin; the engine stays generic.
+
+# Where your running app is reachable. Point at localhost while developing,
+# or a deployed URL. The robot drives THIS, so it must be up before you render.
+baseUrl: http://localhost:3000
+
+viewport: { width: 1600, height: 900 }
+
+# Rendering mode. Omit for normal DOM apps (React/Vue/Svelte/server-rendered/plain HTML).
+# Set to "canvas" for Flutter / Unity / <canvas> apps that expose no DOM — democast then
+# drives by screenshot + OCR (needs the `tesseract` binary). See docs/SCHEMA.md.
+# mode: canvas
+
+# --- Narration ------------------------------------------------------------------
+# Voices are Piper models (offline, free, ~65 MB each). Browse: `npx democast voices`.
+# `default` is used unless a scene sets `voice:`. Add named voices to mix languages.
+voices:
+  default: en_US-hfc_male-medium
+  # urdu:   ur_PK-fasih-medium
+  # german: de_DE-thorsten-medium
+
+# Pacing. Each scene is held on screen for exactly as long as its narration takes;
+# these are the floor and the gap between scenes.
+minHoldMs: 900
+gapMs: 250
+
+# Music bed under the narration (ducked automatically). false = none.
+# Licensing a customer-facing track is YOUR call — see docs/LICENSING.md.
+music: false
+
+# --- Lifecycle hooks (optional) -------------------------------------------------
+# Shell commands run before/after a full render. Use them to seed or reset demo data.
+hooks:
+  before: ""      # e.g. "npm run seed:demo"
+  after: ""       # e.g. "npm run seed:demo"   (leave the box demo-ready)
+
+# --- Auth (optional) ------------------------------------------------------------
+# If present, democast signs in ONCE in a non-recording tab and reuses the session
+# for every scene / act marked `needsAuth: true`. The password is never filmed and
+# never passed on a command line — it is read from the named environment variables.
+auth:
+  # Fast path / canvas apps: reuse a session captured once (Playwright storageState JSON)
+  # instead of driving a login form. When set, the fields below are ignored.
+  # storageState: ./session.json
+  loginPath: /login
+  emailField:    { placeholder: "you@example.com" }   # or { selector: "#email" }
+  passwordField: { selector: "input[type=password]" }
+  submit:        { role: button, name: "Sign in" }
+  # login is considered successful if the URL no longer matches this path
+  successUrlNot: /login
+  env: { email: DEMOCAST_EMAIL, password: DEMOCAST_PASSWORD }
+
+# --- Custom actions (optional) --------------------------------------------------
+# A plugin that adds domain verbs (e.g. pickStall, gotoPortal) to the built-in set.
+# Remove this line if you only need the built-ins (goto/click/fill/wait/...).
+actions: ./democast.actions.mjs
+
+# --- Coverage (optional) --------------------------------------------------------
+# Cross-check the scene file against a human-facing script so the two cannot drift.
+# mode: numbered  -> every "N. " line in the script must be cited by some scene.
+# mode: off       -> skip the check.
+coverage:
+  mode: off
+  script: docs/DEMO_SCRIPT.md

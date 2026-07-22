@@ -1,0 +1,18 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: node --check bin/cli.mjs
+      - run: node --check src/record.mjs
+      - run: python3 -m py_compile src/narrate.py src/mux.py src/coverage.py src/voices.py
+      - run: npm install --no-audit --no-fund
+      # init into a temp dir and confirm the scaffold lands
+      - run: |
+          mkdir -p /tmp/proj && cd /tmp/proj
+          node "$GITHUB_WORKSPACE/bin/cli.mjs" init
+          test -f democast.config.yaml && test -f demo.yaml && test -f AGENTS.md

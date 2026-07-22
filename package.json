@@ -1,0 +1,34 @@
+{
+  "name": "democast",
+  "version": "0.1.0",
+  "description": "Turn a demo.yaml your coding agent writes into a narrated demo video — model-independent, offline TTS, free.",
+  "keywords": ["demo", "video", "screencast", "playwright", "tts", "piper", "narration", "ai", "agent", "walkthrough"],
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "democast": "bin/cli.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "docs/",
+    "templates/",
+    "AGENTS.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0",
+    "yaml": "^2.9.0"
+  },
+  "scripts": {
+    "postinstall": "node bin/cli.mjs banner || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nayyershahzad/democast"
+  }
+}

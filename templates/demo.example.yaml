@@ -1,0 +1,53 @@
+# demo.yaml — the ONE file your coding agent writes and keeps in sync with the app.
+# Full field reference: docs/SCHEMA.md
+#
+# Golden rule for the narration (`say:`): short, speakable lines. No parentheses,
+# no "e.g.", spell numbers out if the voice mangles them ("thirty four thousand").
+# The line's spoken length becomes how long the scene is held on screen.
+
+acts:
+  - name: Opening
+    scenes:
+      - id: landing
+        say: "Meet Acme — the fastest way for a team to ship a changelog."
+        expect: ["Get started"]        # text that MUST be on screen, or the run fails
+        actions:
+          - goto: /
+          - wait: 2000
+
+  - name: Sign up
+    scenes:
+      - id: signup
+        say: "One email, one click, and you are in. No credit card."
+        steps: [1]                     # optional — only used if coverage is on
+        actions:
+          - goto: /signup
+          - fillPlaceholder: { placeholder: "Email", value: "sana@acme.io" }
+          - clickRole: { role: button, name: "Create account" }
+          - wait: 3000
+
+  - name: The dashboard
+    needsAuth: true                    # signed in off-camera, see auth: in config
+    scenes:
+      - id: dashboard
+        say: "Every release your team shipped, on one timeline."
+        expect: ["Releases"]
+        actions:
+          - goto: /app
+          - wait: 3500
+      - id: compose
+        say: "Writing a new entry is just markdown. Publish, and it is live."
+        voice: default                 # or a named voice from config (e.g. urdu)
+        actions:
+          - clickRole: { role: button, name: "New entry" }
+          - fillPlaceholder: { placeholder: "What changed?", value: "Dark mode is here." }
+          - clickRole: { role: button, name: "Publish" }
+          - wait: 3000
+
+  - name: Close
+    scenes:
+      - id: outro
+        say: "Acme. Ship it, tell everyone, move on. Start free today."
+        actions:
+          - goto: /
+          - wait: 3000
