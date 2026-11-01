@@ -112,7 +112,11 @@ def main():
 
     if made:
         lst = B / "master.txt"
-        lst.write_text("\n".join(f"file '{m}'" for _, m in made))
+        # concat quotes with ', so an apostrophe in an act name ("Areeba's record") is
+        # written as '\'' (forward slashes, so the backslash is the escape), or ffmpeg
+        # drops that act and every one after it.
+        q = lambda m: m.as_posix().replace("'", "'\\''")
+        lst.write_text("\n".join(f"file '{q(m)}'" for _, m in made))
         run("ffmpeg", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
             "-c", "copy", str(OUT / "master.mp4"), "-y")
 

@@ -7,18 +7,21 @@ Usage:
 """
 import os, pathlib, subprocess, sys
 
+# A venv keeps its programs in Scripts/ on Windows, bin/ elsewhere.
+BIN = "Scripts" if os.name == "nt" else "bin"
+EXE = ".exe" if os.name == "nt" else ""
 TTS = pathlib.Path(os.environ["DEMOCAST_TTS"])
 VENV = TTS / "venv"
-PY = VENV / "bin" / "python"
+PY = VENV / BIN / "python"
 VOICES = TTS / "voices"
 
 
 def ensure_venv():
-    if not (VENV / "bin" / "piper").exists():
+    if not (VENV / BIN / f"piper{EXE}").exists():
         print("  creating piper venv (one-time)…")
-        subprocess.run(["python3", "-m", "venv", str(VENV)], check=True)
-        subprocess.run([str(VENV / "bin" / "pip"), "install", "-q", "--upgrade", "pip"], check=True)
-        subprocess.run([str(VENV / "bin" / "pip"), "install", "-q", "piper-tts", "pyyaml"], check=True)
+        subprocess.run([sys.executable, "-m", "venv", str(VENV)], check=True)
+        subprocess.run([str(PY), "-m", "pip", "install", "-q", "--upgrade", "pip"], check=True)
+        subprocess.run([str(PY), "-m", "pip", "install", "-q", "piper-tts", "pyyaml"], check=True)
 
 
 def get(voice: str):
