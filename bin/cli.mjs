@@ -35,11 +35,16 @@ function sh(cmd, args, extraEnv = {}) {
   const env = { ...process.env, DEMOCAST_CONFIG: CONFIG, DEMOCAST_SCENES: SCENES,
                 DEMOCAST_BUILD: BUILD, DEMOCAST_TTS: TTS, ...extraEnv };
   return new Promise((res) => {
-    const p = spawn(cmd, args, { stdio: 'inherit', env, cwd: CWD });
+    // Windows: npx is a .cmd shim, which Node only runs through a shell.
+    const win = process.platform === 'win32' && cmd === 'npx';
+    const p = win ? spawn(['npx.cmd', ...args].join(' '), { stdio: 'inherit', env, cwd: CWD, shell: true })
+                  : spawn(cmd, args, { stdio: 'inherit', env, cwd: CWD });
     p.on('close', code => res(code ?? 1));
   });
 }
-const py   = (f, args = [], env = {}) => sh('python3', [join(PKG, 'src', f), ...args], env);
+// Windows has no python3 (only a Store stub that fails); its interpreter is `python`.
+const PY3  = process.platform === 'win32' ? 'python' : 'python3';
+const py   = (f, args = [], env = {}) => sh(PY3, [join(PKG, 'src', f), ...args], env);
 const node = (f, args = [], env = {}) => sh('node',   [join(PKG, 'src', f), ...args], env);
 
 function have(bin, vArg = '-version') {
@@ -149,7 +154,7 @@ async function cmdDoctor() {
   ok('node >= 18', Number(process.versions.node.split('.')[0]) >= 18);
   const ff = have('ffmpeg'); ok('ffmpeg', ff);
   const fp = have('ffprobe'); ok('ffprobe', fp);
-  const p3 = have('python3', '--version'); ok('python3', p3);
+  const p3 = have(PY3, '--version'); ok(PY3, p3);
   if (!ff || !fp) console.log('     ' + C.y('→ install ffmpeg:  brew install ffmpeg   |   apt install ffmpeg'));
 
   console.log('\n  fetching browser + voices…\n');

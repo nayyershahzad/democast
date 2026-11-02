@@ -15,8 +15,10 @@ import json, os, pathlib, subprocess, sys, yaml
 CONFIG = pathlib.Path(os.environ["DEMOCAST_CONFIG"])
 SCENES = pathlib.Path(os.environ["DEMOCAST_SCENES"])
 BUILD  = pathlib.Path(os.environ["DEMOCAST_BUILD"])
+# A venv keeps its programs in Scripts/ on Windows, bin/ elsewhere.
+BIN = "Scripts" if os.name == "nt" else "bin"
 TTS    = pathlib.Path(os.environ["DEMOCAST_TTS"])
-PIPER  = TTS / "venv" / "bin" / "piper"
+PIPER  = TTS / "venv" / BIN / "piper"
 OUT    = BUILD / "audio"
 
 
